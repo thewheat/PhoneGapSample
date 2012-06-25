@@ -1,0 +1,221 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Cordova</title>
+	<style type="text/css">
+		* {
+			font-size: 20px;
+		}
+		#map_canvas{
+			width: 100%;
+			height: 200px;
+		}
+		.tweet{
+			padding: 4px;
+			border-bottom: 1px solid black;
+		}
+		.time{
+			font-size: smaller;
+			font-weight: bold;
+		}
+	</style>
+	<!-- PhoneGap -->
+	<script type="text/javascript" charset="utf-8" src="cordova-1.8.1.js"></script>
+	<!-- jQuery  -->
+	<script type="text/javascript" charset="utf-8" src="jquery-1.7.2.min.js"></script>
+	<!-- Google Maps - you may use this API key or you can set up your own API key  -->
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDogqs7x_RrzJtgXpLYhrj6ac4HZ5zES9Y&sensor=false"></script>
+	
+	
+	
+    <script type="text/javascript" charset="utf-8">
+	
+	// using plain Javascript
+	function onLoad() {
+		document.addEventListener("deviceready", onDeviceReady, false);
+	}
+
+	// using jQuery
+	$(document).ready(function(){
+		$("#status").text("The app has loaded");
+	});
+
+	function onDeviceReady(){
+		initializeMapICentre();
+	}
+    
+    ////////////////////////////////////////////////////
+    // streaming audio - 1
+	// stream an audio stream using PhoneGap Media API
+	
+	var mediaPlaying = false;
+    var myAudio = null;
+    function mediaPlay() {
+		if (!mediaPlaying) {
+	   	    if (myAudio != null) {
+				myAudio.release();
+			}
+			var URL_STREAM = document.getElementById('mediaStation').value;
+			myAudio = new Media(URL_STREAM);
+            myAudio.play();	
+			mediaPlaying = true;	
+			document.getElementById('play').src = "images/stop.png";
+			updateStatus("Loading stream...");
+		} else {
+			myAudio.stop();
+			mediaPlaying = false;
+            document.getElementById('play').src = "images/play.png";    
+			updateStatus("Stream has been stopped");
+		}
+    }
+
+	function updateStatus(str)
+	{
+		$("#status").text(str);
+	}
+	
+    // streaming audio - 0
+    ////////////////////////////////////////////////////////////////////
+    // twitter - 1
+	// data scraping using jQuery's getJSON
+	
+	function loadTweets(user){
+		var url = "http://search.twitter.com/search.json?q=";
+		
+		url = "http://api.twitter.com/1/statuses/user_timeline.json?";
+		url += "&screen_name=" + user;
+		url += "&callback=?";
+		
+		// note: you cannot just simply retrieve any page on the Internet due to Javascript's security implementation
+		// some sites (such as Twitter) allow doing so through JSONP and thus retrieval of tweets via Javascript is possible
+		$.getJSON(url, function(data){
+			var msg = "";
+			for(var i =0 ; i < data.length; i++)
+			{
+				var tweet = data[i];
+				msg += "<div class='tweet'>";
+				msg += "<span class='time'>"
+				msg += tweet.created_at.replace(/ \+.*/, "") + ": ";
+				msg += "</span>";
+				msg += tweet.text;
+				msg += "</div>";
+			}
+			$("#divContent").html(msg);
+		});
+	}
+	
+	// twitter - 0
+	////////////////////////////////////////////////////////////////////
+	// facebook - 1
+	// data scraping using plain Javascript using indexOf and substring
+	
+	function loadLikes(page){
+		// this is a PhoneGap special feature. it will allow cross domain GET calls that normal Javascript won't allow. Thus this code will not run in a browser
+		url = "https://www.facebook.com/" + page;
+		$.get(url, function(data){
+			// data is the source retrieved from 
+			var pos_end = data.indexOf(" like");
+			if(pos_end != -1)
+			{
+				var pos_start = data.indexOf(">", pos_end - 10);
+				if(pos_start != -1)
+				{
+					$("#divContent").text(data.substring(pos_start+1, pos_end) + " likes");
+				}
+			}
+		});
+	}
+	// facebook - 0
+	////////////////////////////////////////////////////////////////////
+	// blog posts - 1
+	// using jQuery traversal
+	
+	function loadBlogPosts(a)
+	{
+		try
+		{
+		var url = "http://ubdfm.blogspot.com";
+		$.get(url, function(data){
+			try
+			{
+				var msg = '';
+				var pos_start = data.indexOf("<body");
+				var pos_end = data.indexOf("</body>");
+				var element = $("<div></div>");
+				var contents = data.substring(pos_start, pos_end);
+				contents +=  "</div>";
+				element.html(contents);
+				// data is the source retrieved from 
+				element.find(".post-title").each(function(i){
+					msg += "<li>" + $(this).text() + "</li>";
+				});
+				$("#divContent").html(msg);
+			}
+			catch(e)
+			{
+				alert(e);
+			}
+			
+		});
+		}
+		catch(ee)
+		{
+			alert(ee);
+		}
+		
+	}
+	
+	// blog posts - 0
+	////////////////////////////////////////////////////////////////////
+	// map - 1
+	// using Google Maps API
+	
+	function initializeMapICentre() {
+		var myLatlng = new google.maps.LatLng(4.937307402405545, 114.94176506996155);
+		var myOptions = {
+			zoom: 17,
+			center: myLatlng,
+			mapTypeId: google.maps.MapTypeId.ROADMAP
+		}
+		var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+
+		var marker = new google.maps.Marker({
+			position: myLatlng, 
+			map: map,
+			title:"We are here! I think...."
+		});
+	}		
+	// map - 0
+	////////////////////////////////////////////////////////////////////
+	
+    </script>
+</head>
+<body onload="onLoad()">
+	<div class="section" id="s_streaming">
+
+		<div>
+			Select a station: 
+			<select id="mediaStation">
+				<option value="http://202.152.84.115:801/kfm">KristalFM</option>
+				<option value="http://202.160.1.55:8000">UBDFM</option>
+			</select>
+		</div>
+		<a href="#" onclick="mediaPlay()" id="lnk_play"><img id="play" src="images/play.png"></a>
+			<div id="status"></div>	
+		
+		<div>
+			<ul>
+				<li><a href="http://kristal.fm/">Kristal FM</a></li>
+				<li><a href="http://www.ubdfm.blogspot.com">UBD FM</a></li>
+				<li><a href="http://twitter.com/ubdfm">@UBDfm</a> (this link loads in the app due to it being whitelisted in res/xml/cordova.xml)</li>
+				<li><a href="#" onclick="loadTweets('ubdfm'); return false;">Show @UBDfm tweets</a></li>
+				<li><a href="#" onclick="loadBlogPosts('http://ubdfm.blogspot.com'); return false;">Blog Posts on UBDfm website</a></li>
+				<li><a href="#" onclick="loadLikes('kristalfmbrunei'); return false;">Show Kristal FM Facebook likes</a></li>
+			</ul>
+		</div>
+		<div id="divContent"></div>
+		<div id="map_canvas"></div>
+	</div>
+	
+</body>
+</html>

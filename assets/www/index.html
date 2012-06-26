@@ -167,7 +167,49 @@
 	}		
 	// map - 0
 	////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////
+    // twitter - 1
 	
+	// this fails probably due to data returned is different than viewed in browser
+	function loadTweetsFail(user){
+		var url = "http://mobile.twitter.com/" + user;
+		alert(url);
+		$.get(url, function(data){
+			alert("data with no info!:" + data);
+			var msg = "";
+			$("#divContent").html(data);
+		});
+	}
+	
+	// twitter - 0
+	////////////////////////////////////////////////////////////////////
+	// blog posts - 1
+	// this fails probably due to .html(data) and having script tags
+	function loadBlogPostsFail(url)
+	{
+
+		alert(url);
+		$.get(url, function(data){
+			alert("this will white screen of death");
+			var msg = '';
+			var pos_start = data.indexOf("<div class='blog-posts hfeed'>");
+			var pos_end = data.indexOf("<div class='blog-pager' id='blog-pager'>");
+			var element = $("<div></div>");
+			var contents = data.substring(pos_start, pos_end);
+			contents +=  "</div>";
+			element.append(contents);
+			
+			//element.html(data);
+			element.find(".post-title").each(function(i){
+				msg += "<li>" + $(this).text() + "</li>";
+			});
+			$("#divContent").text(msg);
+		});
+		
+	}
+	
+	// blog posts - 0
+	////////////////////////////////////////////////////////////////////	
     </script>
 </head>
 <body onload="onLoad()">
@@ -191,6 +233,9 @@
 				<li><a href="#" onclick="loadTweets('ubdfm'); return false;">Show @UBDfm tweets</a></li>
 				<li><a href="#" onclick="loadStoreItems(); return false;">Load Kristal FM store items</a></li>
 				<li><a href="#" onclick="loadLikes('kristalfmbrunei'); return false;">Show Kristal FM Facebook likes</a></li>
+				
+				<li><a href="#" onclick="loadTweetsFail('ubdfm'); return false;">#FAIL: Show @UBDfm tweets</a></li>
+				<li><a href="#" onclick="loadBlogPostsFail('http://ubdfm.blogspot.com'); return false;">#FAIL: Blog Posts on UBDfm website</a></li>
 			</ul>
 		</div>
 		<div id="divContent"></div>

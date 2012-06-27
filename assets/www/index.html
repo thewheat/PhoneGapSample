@@ -38,6 +38,24 @@
 	// using jQuery
 	$(document).ready(function(){
 		$("#status").text("The app has loaded");
+/*
+var data = '' +		
+'<img src="imgs/bullet1.gif" width="12" height="12"> 250 CCTVs to be installed<br>\n'+
+'<img src="imgs/bullet1.gif" width="12" height="12"> 72 hectares of Belait forest gutted in fires<br>\n'+
+'<img src="imgs/bullet1.gif" width="12" height="12"> \'Closer connections\' can lead to improved research outputs<br>\n'+
+'<img src="imgs/bullet1.gif" width="12" height="12"> Health tourism, ICT application new areas of cooperation between Brunei & Malaysia<br>\n'+
+'<img src="imgs/bullet1.gif" width="12" height="12"> His Majesty receives new envoys in audience<br>\n'+
+'<img src="imgs/bullet1.gif" width="12" height="12"> Brunei to globalise Borneo by hosting Asean Summit<br>\n'+
+'<img src="imgs/bullet1.gif" width="12" height="12"> Maktab Sains wins top honours<br>\n'+
+'<img src="imgs/bullet1.gif" width="12" height="12"> KUPU SB signs MoU with UiTM and UNMUL<br>\n'+
+'<img src="imgs/bullet1.gif" width="12" height="12"> Educators focus on improving students\' learning experience<br>\n'+
+'<img src="imgs/bullet1.gif" width="12" height="12"> \'Saturday Night Fever\' aerobics workout at CF10</strong></font></td>\n'+
+'<tr>\n'+
+'';
+var y = data.replace(/width="12" height="12">([^<]*)</g, function(m, g1) {
+  //alert(g1);
+});//*/
+		
 	});
 
 	function onDeviceReady(){
@@ -210,6 +228,17 @@
 	
 	// blog posts - 0
 	////////////////////////////////////////////////////////////////////	
+	function bbHeadlines(){
+		$.get("http://www.borneobulletin.com.bn", function(data){
+			var msg = '';
+			var y = data.replace(/width="12" height="12">([^<]*)</g, function(m, g1) {
+			  msg += g1 + "<HR>";
+			});
+			$("#divContent").html(msg);
+			
+		});
+	}
+	////////////////////////////////////////////////////////////////////	
 	// retreieve the main and side deals from social deals
 	function socialDeal(){
 		$.get("http://socialdeal.com.bn/", function(data){
@@ -265,6 +294,7 @@
 		<div id="divContent"></div>
 		<div>
 			<ul>
+				<li><a href="#" onclick="bbHeadlines(); return false">Borneo Bulletin Headlines</a></li>
 				<li><a href="#" onclick="socialDeal(); return false">Social Deal</a></li>
 				<li><a href="http://kristal.fm/">Kristal FM</a></li>
 				<li><a href="http://www.ubdfm.blogspot.com">UBD FM</a></li>

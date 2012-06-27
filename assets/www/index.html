@@ -210,6 +210,43 @@
 	
 	// blog posts - 0
 	////////////////////////////////////////////////////////////////////	
+	// retreieve the main and side deals from social deals
+	function socialDeal(){
+		$.get("http://socialdeal.com.bn/", function(data){
+			var deals = ''; var pos_end;
+			var pos_start = data.indexOf("<h2>");
+			if(pos_start != -1)
+			{
+				pos_end = data.indexOf("</h2>", pos_start);
+				if(pos_end != -1)
+					deals += data.substring(pos_start, pos_end) + "</h2>";
+			}
+			pos_start = data.indexOf('<div class="deal_content">');
+			if(pos_start != -1)
+			{
+				pos_end = data.indexOf("</div>", pos_start);
+				if(pos_end != -1)
+					deals += data.substring(pos_start, pos_end) + "</div>";
+			}
+			pos_start = data.indexOf('<div class="deal_content">', pos_start+1);
+			if(pos_start != -1)
+			{
+				pos_end = data.indexOf("</div>", pos_start);
+				if(pos_end != -1)
+					deals += data.substring(pos_start, pos_end) + "</div>";
+			}
+			$("#divContent").html(deals);
+			/*
+			var deals = '';
+			deals += "<h2>" + element.find(".topcontent h2").eq(0).text() + "</h2>";
+			element.find(".deal_content").each(function(i){
+				alert("HI");
+				deals += "<h3>" + $(this).text() + "</h3>";
+			});
+			//*/
+						
+		});
+	}
     </script>
 </head>
 <body onload="onLoad()">
@@ -225,8 +262,10 @@
 		<a href="#" onclick="mediaPlay()" id="lnk_play"><img id="play" src="images/play.png"></a>
 			<div id="status"></div>	
 		
+		<div id="divContent"></div>
 		<div>
 			<ul>
+				<li><a href="#" onclick="socialDeal(); return false">Social Deal</a></li>
 				<li><a href="http://kristal.fm/">Kristal FM</a></li>
 				<li><a href="http://www.ubdfm.blogspot.com">UBD FM</a></li>
 				<li><a href="http://twitter.com/ubdfm">@UBDfm</a> (this link loads in the app due to it being whitelisted in res/xml/cordova.xml)</li>
@@ -238,7 +277,6 @@
 				<li><a href="#" onclick="loadBlogPostsFail('http://ubdfm.blogspot.com'); return false;">#FAIL: Blog Posts on UBDfm website</a></li>
 			</ul>
 		</div>
-		<div id="divContent"></div>
 		<div id="map_canvas"></div>
 	</div>
 	
